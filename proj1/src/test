@@ -1,0 +1,98 @@
+#!/bin/sh
+
+
+### !!not optimized variables###
+#server variables
+#SERVER_WORKER_NUM = 4
+#SERVER_SLICE_SiZE = 20
+
+# test driver variables
+#DRIVER_CONCURRENCY=10
+#export DRIVER_CONCURRENCY
+#DRIVER_ITERATIONS=20000
+#export DRIVER_ITERATIONS
+#ARRAY_LENGTH=50
+#export ARRAY_LENGTH
+
+
+### optimized variables###
+
+#server variables
+SERVER_WORKER_NUM=3
+export SERVER_WORKER_NUM
+SERVER_SLICE_SiZE=100
+export SERVER_SLICE_SiZE
+
+# test driver variables
+DRIVER_CONCURRENCY=13
+export DRIVER_CONCURRENCY
+DRIVER_ITERATIONS=20000
+export DRIVER_ITERATIONS
+ARRAY_LENGTH=200
+export ARRAY_LENGTH
+
+
+NAME=${USER}
+OSNAME=`uname -s`
+GDIR=`pwd`
+if [ $# -eq 1 ]; then
+LOG="${GDIR}/results/${NAME}-${OSNAME}-$1.log"
+else
+LOG="${GDIR}/results/${NAME}-${OSNAME}.log"
+fi
+TMPFILE1="${GDIR}/results/${NAME}-${OSNAME}.tmpfile1"
+TMPFILE2="${GDIR}/results/${NAME}-${OSNAME}.tmpfile2"
+TMPFILE3="${GDIR}/results/${NAME}-${OSNAME}.tmpfile3"
+SERVERHOST="localhost"
+export SERVERHOST
+trap "kill -KILL 0;" INT
+export SERVERHOST
+echo "==========${NAME} on ${OSNAME}===================================" >${LOG} 2>&1
+echo "testing NAME=${NAME} OSNAME=${OSNAME}"
+# The following should not be necessary if we started with a clean directlry and have already configured it.
+#make clean
+#./configure
+rm -f ${TMPFILE1} ${TMPFILE2} ${TMPFILE3}
+if [ ! -d results ]; then mkdir results; fi
+echo "==========compilation=============================" >>${LOG} 2>&1
+make >> ${LOG} 2>&1
+if [ -d testdir ]; then rm -rf testdir; fi
+mkdir testdir
+cd testdir
+pkill -KILL srv
+echo "==========testing=================================" >>${LOG} 2>&1
+##../multisrv -n SERVER_WORKER_NUM -k SERVER_SLICE_SiZE 2>${TMPFILE2}&
+../multisrv 2>${TMPFILE2}&
+cd ..
+
+sleep .5
+# PORT=44461
+PORT=`sed -e "s/^[^0-9]*//; s/^\([0-9][0-9]*\)[^0-9].*/\1/" ${TMPFILE2}`
+echo server using port ${PORT}
+
+# sleep 5;
+
+# Note: The above is a lazy solution. It could be done better by
+# using a much shorter delay and polling ${TMPFILE} until there is
+# a value.
+
+
+./driver ${PORT} > ${TMPFILE3} 2>&1
+# kill -INT ${TIMER}
+# sleep 
+echo "==========server outputs===================" >>${LOG} 2>&1 >>${LOG} 2>&1
+echo "==========stdout=========="  >>${LOG} 2>&1
+if [ -f ${TMPFILE1} ]; then
+   cat ${TMPFILE1} >> ${LOG}
+fi
+echo "==========stderr=========="  >>${LOG} 2>&1
+if [ -f ${TMPFILE2} ]; then
+   cat ${TMPFILE2} >> ${LOG}
+fi
+echo "==========driver outputs===================" >>${LOG} 2>&1
+if [ -f ${TMPFILE3} ]; then
+   cat ${TMPFILE3} >> ${LOG}
+fi
+rm -f ${TMPFILE1} ${TMPFILE2} ${TMPFILE3}
+echo "==========done====================================" >>${LOG} 2>&1
+kill -KILL 0

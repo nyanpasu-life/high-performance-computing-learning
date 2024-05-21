@@ -1,0 +1,21 @@
+==========st201521032 on Linux===================================
+==========compilation=============================
+make: Nothing to be done for 'default'.
+==========testing=================================
+==========server outputs===================
+==========stdout==========
+==========stderr==========
+server using port 57185
+==========driver outputs===================
+driver: (version 2) concurrency = 10; iterations = 20000; array length = 50
+  0: completed 20000 iterations: connection wait time    0 ms, real time 1380 ms, CPU time  670 ms
+  1: completed 20000 iterations: connection wait time    0 ms, real time 1400 ms, CPU time  700 ms
+  2: completed 20000 iterations: connection wait time    0 ms, real time 1340 ms, CPU time  630 ms
+  3: completed 20000 iterations: connection wait time    0 ms, real time 1340 ms, CPU time  660 ms
+  4: completed 20000 iterations: connection wait time    0 ms, real time 1280 ms, CPU time  630 ms
+  5: completed 20000 iterations: connection wait time    0 ms, real time 1330 ms, CPU time  670 ms
+  6: completed 20000 iterations: connection wait time    0 ms, real time 1230 ms, CPU time  610 ms
+  7: completed 20000 iterations: connection wait time    0 ms, real time 1340 ms, CPU time  640 ms
+  8: completed 20000 iterations: connection wait time    0 ms, real time 1380 ms, CPU time  680 ms
+  9: completed 20000 iterations: connection wait time    0 ms, real time 1390 ms, CPU time  680 ms
+==========done====================================
